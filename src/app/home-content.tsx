@@ -1,6 +1,5 @@
 "use client";
 
-import { PlatformSelector } from "@/components/PlatformSelector";
 import { DramaSection } from "@/components/DramaSection";
 import { ReelShortSection } from "@/components/ReelShortSection";
 import { NetShortHome } from "@/components/NetShortHome";
@@ -20,13 +19,8 @@ export default function HomeContent() {
   const { data: dubindoDramas, isLoading: loadingDubindo, error: errorDubindo, refetch: refetchDubindo } = useDubindoDramas();
 
   return (
-    <main className="min-h-screen pt-16">
-      {/* Platform Selector */}
-      <div className="glass-strong sticky top-16 z-40">
-        <div className="container mx-auto">
-          <PlatformSelector />
-        </div>
-      </div>
+    <main className="min-h-screen pt-16 relative">
+      {/* Platform Selector moved to RootLayout */}
 
       {/* DramaBox Content - Multiple Sections */}
       {isDramaBox && (

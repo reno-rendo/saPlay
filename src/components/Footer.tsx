@@ -1,10 +1,16 @@
 "use client";
 
 import { ExternalLink } from "lucide-react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export function Footer() {
+interface FooterProps {
+  siteName?: string | null;
+  description?: string | null;
+  footerText?: string | null;
+  copyrightText?: string | null;
+}
+
+export function Footer({ siteName, description, footerText, copyrightText }: FooterProps) {
   const pathname = usePathname();
 
   // Hide footer on watch pages for immersive video experience
@@ -13,40 +19,19 @@ export function Footer() {
   }
 
   return (
-    <footer className="border-t border-border/50 bg-background/80 backdrop-blur-sm">
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-col items-center justify-center gap-3">
-          {/* API Promo */}
-          {/* <ul className="space-y-2 text-sm">
-              <li>
-                <a 
-                  href="https://lynk.id/sansekai/6gdx3w875wx1" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1 text-primary hover:underline font-semibold"
-                >
-                  Beli Source Code Website Ini
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </li>
-          </ul> */}
+    <footer className="border-t border-white/5 bg-background/80 backdrop-blur-xl relative overflow-hidden pb-28">
+      {/* Glow effect at bottom */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-24 bg-primary/10 blur-[100px] pointer-events-none" />
 
-          <p className="text-sm text-muted-foreground text-center">
-            API yang digunakan:{" "}
-            <a 
-                  href="https://api.sansekai.my.id" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1 text-primary hover:underline font-semibold"
-                >
-                  SΛNSΞKΛI API
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-          </p>
+      <div className="container mx-auto px-4 py-8 relative z-10">
+        <div className="flex flex-col items-center justify-center gap-6">
+          {/* Site Name and Description removed as requested */}
+
+          <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-2" />
 
           {/* Copyright */}
-          <p className="text-xs text-muted-foreground/80 text-center font-medium">
-            © {new Date().getFullYear()} Made with ❤️ by Yusril
+          <p className="text-xs text-zinc-500 font-medium tracking-wide">
+            {copyrightText || `© 2026 MADE WITH ❤️ BY BAHLIL`}
           </p>
         </div>
       </div>

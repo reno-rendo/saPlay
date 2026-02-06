@@ -1,5 +1,6 @@
 import { UnifiedMediaCard } from "./UnifiedMediaCard";
 import { DramaCardSkeleton } from "./DramaCardSkeleton";
+import NativeAdCard from "@/components/ads/NativeAdCard";
 import type { Drama } from "@/types/drama";
 
 interface DramaGridProps {
@@ -29,28 +30,40 @@ export function DramaGrid({ dramas, isLoading, title, subtitle }: DramaGridProps
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-4">
         {isLoading
           ? Array.from({ length: 12 }).map((_, i) => (
-              <DramaCardSkeleton key={i} index={i} />
-            ))
+            <DramaCardSkeleton key={i} index={i} />
+          ))
           : dramas
-              ?.filter((drama) => drama.bookId)
-              .map((drama, index) => (
-                <UnifiedMediaCard 
-                  key={drama.bookId} 
-                  index={index}
-                  title={drama.bookName}
-                  cover={drama.coverWap || drama.cover || ""}
-                  link={`/detail/dramabox/${drama.bookId}`}
-                  episodes={drama.chapterCount}
-                  topLeftBadge={drama.corner ? {
-                    text: drama.corner.name,
-                    color: (drama.corner.name?.toLowerCase().includes("populer")) ? "#E52E2E" : (drama.corner.color || "#e5a00d")
-                  } : null}
-                  topRightBadge={drama.rankVo ? {
-                    text: drama.rankVo.hotCode,
-                    isTransparent: true
-                  } : null}
-                />
-              ))}
+            ?.filter((drama) => drama.bookId)
+            .map((drama, index) => {
+              // Show Ad every 6 items (change as needed)
+              const showAd = (index + 1) % 6 === 0;
+
+              return (
+                <>
+                  <UnifiedMediaCard
+                    key={drama.bookId}
+                    index={index}
+                    title={drama.bookName}
+                    cover={drama.coverWap || drama.cover || ""}
+                    link={`/detail/dramabox/${drama.bookId}`}
+                    episodes={drama.chapterCount}
+                    topLeftBadge={drama.corner ? {
+                      text: drama.corner.name,
+                      color: (drama.corner.name?.toLowerCase().includes("populer")) ? "#E52E2E" : (drama.corner.color || "#e5a00d")
+                    } : null}
+                    topRightBadge={drama.rankVo ? {
+                      text: drama.rankVo.hotCode,
+                      isTransparent: true
+                    } : null}
+                  />
+                  {showAd && (
+                    <div key={`ad-${index}`} className="relative">
+                      <NativeAdCard index={index} />
+                    </div>
+                  )}
+                </>
+              );
+            })}
       </div>
 
       {!isLoading && dramas?.length === 0 && (

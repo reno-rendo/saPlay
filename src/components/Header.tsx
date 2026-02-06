@@ -15,83 +15,43 @@ import { usePlatform } from "@/hooks/usePlatform";
 import { useDebounce } from "@/hooks/useDebounce";
 import { usePathname } from "next/navigation";
 
-export function Header() {
+interface HeaderProps {
+  siteName?: string | null;
+  logoUrl?: string | null;
+}
+
+export function Header({ siteName, logoUrl }: HeaderProps) {
   const pathname = usePathname();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedQuery = useDebounce(searchQuery, 300);
   const normalizedQuery = debouncedQuery.trim();
 
-  // Platform context
-  const { isDramaBox, isReelShort, isNetShort, isMelolo, isFlickReels, isFreeReels, platformInfo } = usePlatform();
+  // ... (contexts) ...
 
-  // Search based on platform
-  const { data: dramaBoxResults, isLoading: isSearchingDramaBox } = useSearchDramas(
-    isDramaBox ? normalizedQuery : ""
-  );
-  const { data: reelShortResults, isLoading: isSearchingReelShort } = useReelShortSearch(
-    isReelShort ? normalizedQuery : ""
-  );
-  const { data: netShortResults, isLoading: isSearchingNetShort } = useNetShortSearch(
-    isNetShort ? normalizedQuery : ""
-  );
-  const { data: meloloResults, isLoading: isSearchingMelolo } = useMeloloSearch(
-    isMelolo ? normalizedQuery : ""
-  );
-  const { data: flickReelsResults, isLoading: isSearchingFlickReels } = useFlickReelsSearch(
-    isFlickReels ? normalizedQuery : ""
-  );
-  const { data: freeReelsResults, isLoading: isSearchingFreeReels } = useFreeReelsSearch(
-    isFreeReels ? normalizedQuery : ""
-  );
-
-  const isSearching = isDramaBox 
-    ? isSearchingDramaBox 
-    : isReelShort 
-      ? isSearchingReelShort 
-      : isNetShort 
-        ? isSearchingNetShort
-        : isMelolo
-          ? isSearchingMelolo
-          : isFlickReels
-            ? isSearchingFlickReels
-            : isSearchingFreeReels;
-
-  // Search results processing
-  const searchResults = isDramaBox 
-    ? dramaBoxResults 
-    : isReelShort 
-      ? reelShortResults?.data 
-      : isNetShort
-        ? netShortResults?.data
-        : isMelolo
-          ? meloloResults?.data?.search_data?.flatMap((item: any) => item.books || [])
-              .filter((book: any) => book.thumb_url && book.thumb_url !== "") || []
-          : isFlickReels
-            ? flickReelsResults?.data
-            : freeReelsResults;
-
-  const handleSearchClose = () => {
-    setSearchOpen(false);
-    setSearchQuery("");
-  };
-
-  // Hide header on watch pages for immersive video experience
-  if (pathname?.startsWith("/watch")) {
+  // Use props inside JSX
+  // Hide header on watch pages and admin pages
+  if (pathname?.startsWith("/watch") || pathname?.startsWith("/admin")) {
     return null;
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 glass-strong">
+    <header className="fixed top-0 left-0 right-0 z-50 glass-panel">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <Play className="w-5 h-5 text-white fill-white" />
-            </div>
-            <span className="font-display font-bold text-xl gradient-text">
-              SekaiDrama
+            {logoUrl ? (
+              <div className="w-10 h-10 relative flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <img src={logoUrl} alt={siteName || "Logo"} className="w-full h-full object-contain" />
+              </div>
+            ) : (
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                <Play className="w-5 h-5 text-white fill-white" />
+              </div>
+            )}
+            <span className="font-display font-bold text-xl text-gradient">
+              {siteName || "SekaiDrama"}
             </span>
           </Link>
 
@@ -122,7 +82,7 @@ export function Header() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={`Cari drama di ${platformInfo.name}...`}
-                    className="search-input pl-12"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 pl-12 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all duration-300"
                     autoFocus
                   />
                 </div>
@@ -179,7 +139,7 @@ export function Header() {
                           {drama.tagNames && (
                             <div className="flex flex-wrap gap-1.5 mt-2">
                               {drama.tagNames.slice(0, 3).map((tag: string) => (
-                                <span key={tag} className="tag-pill text-[10px]">
+                                <span key={tag} className="px-2 py-0.5 rounded-full bg-white/5 text-muted-foreground text-[10px] border border-white/5">
                                   {tag}
                                 </span>
                               ))}
@@ -217,7 +177,7 @@ export function Header() {
                           {book.theme && (
                             <div className="flex flex-wrap gap-1.5 mt-2">
                               {book.theme.slice(0, 3).map((tag: string, idx: number) => (
-                                <span key={idx} className="tag-pill text-[10px]">
+                                <span key={idx} className="px-2 py-0.5 rounded-full bg-white/5 text-muted-foreground text-[10px] border border-white/5">
                                   {tag}
                                 </span>
                               ))}
@@ -268,7 +228,7 @@ export function Header() {
                           {drama.labels && drama.labels.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 mt-2">
                               {drama.labels.slice(0, 3).map((tag: string, idx: number) => (
-                                <span key={idx} className="tag-pill text-[10px]">
+                                <span key={idx} className="px-2 py-0.5 rounded-full bg-white/5 text-muted-foreground text-[10px] border border-white/5">
                                   {tag}
                                 </span>
                               ))}
@@ -299,8 +259,8 @@ export function Header() {
                         <div className="w-16 h-24 bg-muted rounded-xl flex-shrink-0 overflow-hidden">
                           {book.thumb_url ? (
                             <img
-                              src={book.thumb_url.includes(".heic") 
-                                ? `https://wsrv.nl/?url=${encodeURIComponent(book.thumb_url)}&output=jpg` 
+                              src={book.thumb_url.includes(".heic")
+                                ? `https://wsrv.nl/?url=${encodeURIComponent(book.thumb_url)}&output=jpg`
                                 : book.thumb_url}
                               alt={book.book_name}
                               className="w-full h-full object-cover"
@@ -322,9 +282,9 @@ export function Header() {
                           )}
                           {book.stat_infos && book.stat_infos.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 mt-2">
-                               <span className="tag-pill text-[10px]">
-                                  {book.stat_infos[0]}
-                               </span>
+                              <span className="px-2 py-0.5 rounded-full bg-white/5 text-muted-foreground text-[10px] border border-white/5">
+                                {book.stat_infos[0]}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -361,7 +321,7 @@ export function Header() {
                           {book.tag_list && book.tag_list.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 mt-2">
                               {book.tag_list.slice(0, 3).map((tag: any, idx: number) => (
-                                <span key={idx} className="tag-pill text-[10px]">
+                                <span key={idx} className="px-2 py-0.5 rounded-full bg-white/5 text-muted-foreground text-[10px] border border-white/5">
                                   {tag.tag_name}
                                 </span>
                               ))}
@@ -401,7 +361,7 @@ export function Header() {
                           {book.content_tags && book.content_tags.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 mt-2">
                               {book.content_tags.slice(0, 3).map((tag: string, idx: number) => (
-                                <span key={idx} className="tag-pill text-[10px]">
+                                <span key={idx} className="px-2 py-0.5 rounded-full bg-white/5 text-muted-foreground text-[10px] border border-white/5">
                                   {tag}
                                 </span>
                               ))}
