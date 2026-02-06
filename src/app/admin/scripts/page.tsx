@@ -33,7 +33,7 @@ export default async function ScriptsPage() {
         await db.insert(adScripts).values({
             title,
             code,
-            position,
+            position: position as "head" | "footer" | "below_player" | "sidebar" | "custom" | "native_grid",
             isActive: true
         });
         revalidatePath("/admin/scripts");

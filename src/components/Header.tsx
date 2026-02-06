@@ -27,9 +27,52 @@ export function Header({ siteName, logoUrl }: HeaderProps) {
   const debouncedQuery = useDebounce(searchQuery, 300);
   const normalizedQuery = debouncedQuery.trim();
 
-  // ... (contexts) ...
+  const { currentPlatform, getPlatformInfo } = usePlatform();
+  const platformInfo = getPlatformInfo(currentPlatform);
 
-  // Use props inside JSX
+  // Platform checks
+  const isDramaBox = currentPlatform === "dramabox";
+  const isReelShort = currentPlatform === "reelshort";
+  const isNetShort = currentPlatform === "netshort";
+  const isMelolo = currentPlatform === "melolo";
+  const isFlickReels = currentPlatform === "flickreels";
+  const isFreeReels = currentPlatform === "freereels";
+
+  // Search hooks for each platform
+  const { data: dramaResults, isLoading: dramaLoading } = useSearchDramas(isDramaBox ? normalizedQuery : "");
+  const { data: reelShortResults, isLoading: reelShortLoading } = useReelShortSearch(isReelShort ? normalizedQuery : "");
+  const { data: netShortResults, isLoading: netShortLoading } = useNetShortSearch(isNetShort ? normalizedQuery : "");
+  const { data: meloloResults, isLoading: meloloLoading } = useMeloloSearch(isMelolo ? normalizedQuery : "");
+  const { data: flickReelsResults, isLoading: flickReelsLoading } = useFlickReelsSearch(isFlickReels ? normalizedQuery : "");
+  const { data: freeReelsResults, isLoading: freeReelsLoading } = useFreeReelsSearch(isFreeReels ? normalizedQuery : "");
+
+  // Determine which results to show (some hooks return {data: [...]} while others return [...] directly)
+  let searchResults: any[] = [];
+  // @ts-ignore - complex type inference from different hook return types
+  if (isDramaBox && dramaResults) searchResults = dramaResults;
+  // @ts-ignore - complex type inference from different hook return types
+  else if (isReelShort && reelShortResults) searchResults = (reelShortResults as any)?.data ?? [];
+  // @ts-ignore - complex type inference from different hook return types
+  else if (isNetShort && netShortResults) searchResults = (netShortResults as any)?.data ?? netShortResults;
+  // @ts-ignore - complex type inference from different hook return types
+  else if (isMelolo && meloloResults) searchResults = (meloloResults as any)?.data ?? meloloResults;
+  // @ts-ignore - complex type inference from different hook return types
+  else if (isFlickReels && flickReelsResults) searchResults = (flickReelsResults as any)?.data ?? flickReelsResults;
+  // @ts-ignore - complex type inference from different hook return types
+  else if (isFreeReels && freeReelsResults) searchResults = (freeReelsResults as any)?.data ?? freeReelsResults;
+
+  const isSearching = isDramaBox ? dramaLoading
+    : isReelShort ? reelShortLoading
+      : isNetShort ? netShortLoading
+        : isMelolo ? meloloLoading
+          : isFlickReels ? flickReelsLoading
+            : isFreeReels ? freeReelsLoading
+              : false;
+
+  const handleSearchClose = () => {
+    setSearchOpen(false);
+    setSearchQuery("");
+  };
   // Hide header on watch pages and admin pages
   if (pathname?.startsWith("/watch") || pathname?.startsWith("/admin")) {
     return null;

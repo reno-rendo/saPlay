@@ -15,7 +15,7 @@ export async function GET(request: Request) {
             query = db.select().from(adScripts).where(
                 and(
                     eq(adScripts.isActive, true),
-                    eq(adScripts.position, position)
+                    eq(adScripts.position, position as typeof adScripts.position.enumValues[number])
                 )
             );
         }
