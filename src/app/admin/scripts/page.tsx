@@ -17,7 +17,7 @@ export default async function ScriptsPage() {
     const session = await getSession();
     if (!session) redirect("/admin/login");
 
-    let scriptList = [];
+    let scriptList: typeof adScripts.$inferSelect[] = [];
     try {
         scriptList = await db.select().from(adScripts).orderBy(desc(adScripts.createdAt));
     } catch (e) {
