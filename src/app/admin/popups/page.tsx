@@ -18,7 +18,7 @@ export default async function PopupsPage() {
     const session = await getSession();
     if (!session) redirect("/admin/login");
 
-    let popupList = [];
+    let popupList: typeof popups.$inferSelect[] = [];
     try {
         popupList = await db.select().from(popups).orderBy(desc(popups.createdAt));
     } catch (e) { /* ignore */ }
